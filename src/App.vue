@@ -32,13 +32,16 @@
         </div>
       </header>
 
-      <nav class="tab-nav">
+      <nav class="tab-nav" role="tablist">
         <button
           v-for="tab in tabs"
           :key="tab.id"
           class="tab-btn"
           :class="{ active: activeTab === tab.id }"
           @click="activeTab = tab.id"
+          :title="tab.label"
+          role="tab"
+          :aria-selected="activeTab === tab.id"
         >
           <span class="tab-icon">{{ tab.icon }}</span>
           <span class="tab-label">{{ tab.label }}</span>
@@ -225,41 +228,50 @@ const profileStyles = computed(() => {
   z-index: 99;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  gap: 0.25rem;
+  padding: 0 0.5rem;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 0.75rem 0.5rem;
+  padding: 0.6rem 0.4rem;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
+  border-radius: 0.5rem;
   color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.15rem;
   font-family: inherit;
+  min-width: 0;
 }
 
 .tab-btn:hover {
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .tab-btn.active {
   color: var(--active-color, white);
   border-bottom-color: var(--active-color, white);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .tab-icon {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
 }
 
 .tab-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .app-main {
@@ -276,6 +288,15 @@ const profileStyles = computed(() => {
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+@media (max-width: 500px) {
+  .tab-label {
+    display: none;
+  }
+  .tab-btn {
+    padding: 0.65rem 0.3rem;
+  }
 }
 
 @media (max-width: 600px) {

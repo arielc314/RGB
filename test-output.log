@@ -1,0 +1,134 @@
+🚀 Step 1: Navigating to https://rgb-app.vercel.app/
+📸 Screenshot saved: 1-01-homepage.png
+✅ Step 1 Complete: Checking homepage elements
+   - RGB Logo visible: true
+   - Profile cards found: 14
+   - אריק card visible: true
+   - דור card visible: true
+   - אוצר card visible: true
+
+🚀 Step 2: Clicking on first profile card (אריק/R)
+   ✓ Clicked via אריק text
+📸 Screenshot saved: 2-02-after-profile-click.png
+   - Checking for onboarding guide overlay...
+   - Guide overlay elements: 6
+   - Modal visible: false
+   - Found onboarding guide, clicking through steps...
+📸 Screenshot saved: 3-03-onboarding-step-1.png
+   - Step 1: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 1
+📸 Screenshot saved: 4-03-onboarding-step-2.png
+   - Step 2: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 2
+📸 Screenshot saved: 5-03-onboarding-step-3.png
+   - Step 3: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 3
+📸 Screenshot saved: 6-03-onboarding-step-4.png
+   - Step 4: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 4
+📸 Screenshot saved: 7-03-onboarding-step-5.png
+   - Step 5: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 5
+📸 Screenshot saved: 8-03-onboarding-step-6.png
+   - Step 6: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 6
+📸 Screenshot saved: 9-03-onboarding-step-7.png
+   - Step 7: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 7
+📸 Screenshot saved: 10-03-onboarding-step-8.png
+   - Step 8: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 8
+📸 Screenshot saved: 11-03-onboarding-step-9.png
+   - Step 9: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 9
+📸 Screenshot saved: 12-03-onboarding-step-10.png
+   - Step 10: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 10
+📸 Screenshot saved: 13-03-onboarding-step-11.png
+   - Step 11: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 11
+📸 Screenshot saved: 14-03-onboarding-step-12.png
+   - Step 12: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 12
+📸 Screenshot saved: 15-03-onboarding-step-13.png
+   - Step 13: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 13
+📸 Screenshot saved: 16-03-onboarding-step-14.png
+   - Step 14: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 14
+📸 Screenshot saved: 17-03-onboarding-step-15.png
+   - Step 15: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 15
+📸 Screenshot saved: 18-03-onboarding-step-16.png
+   - Step 16: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 16
+📸 Screenshot saved: 19-03-onboarding-step-17.png
+   - Step 17: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 17
+📸 Screenshot saved: 20-03-onboarding-step-18.png
+   - Step 18: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 18
+📸 Screenshot saved: 21-03-onboarding-step-19.png
+   - Step 19: Found 17 visible buttons, guide active: true
+   ✓ Clicked button 19
+📸 Screenshot saved: 22-03-onboarding-step-20.png
+   - Step 20: Found 18 visible buttons, guide active: true
+   ✓ Clicked button 20
+📸 Screenshot saved: 23-04-after-onboarding.png
+   🔧 Attempting to dismiss guide overlay...
+   ✓ Guide overlay removed
+
+🚀 Step 3: Testing "המדדים שלי" tab
+📸 Screenshot saved: 24-05-main-profile-view.png
+   - Header visible: true
+   - "?" help button visible: true
+   - Looking for Firebase connection indicator...
+   - Potential green indicator: false
+   - Potential red indicator: false
+   - Tabs found: 13
+   - פנוי/עסוק toggle visible: true
+   - Sliders found: 0
+   - Activity items found: 2
+   - Clicking first activity with force...
+📸 Screenshot saved: 25-07-after-activity-click.png
+   ✓ Activity clicked
+
+🚀 Step 4: Testing "זמינות" tab
+   ✓ Clicked "זמינות" tab
+📸 Screenshot saved: 26-08-availability-tab.png
+   - Calendar visible: true
+   - Time slots visible (07:00-23:00): true
+   - Calendar cells found: 239
+   - Clicking a few calendar cells...
+   ⚠ Cell 6 click failed
+📸 Screenshot saved: 27-09-after-calendar-interaction.png
+   ✓ Calendar cells clicked
+
+🚀 Step 5: Checking other tabs
+   - Total tab elements: 13
+   - Tab 1: "📊המדדים שלי📅זמינות👥הקבוצה🔍מפגשים"
+   - Tab 2: "📊המדדים שלי"
+   - Tab 3: "📊"
+   - Tab 4: "המדדים שלי"
+
+🚀 Step 6: Final checks and summary
+📸 Screenshot saved: 28-10-final-state.png
+   - Page mentions "connected/online": true
+   - Page mentions "disconnected/offline": false
+   - Final page title: RGB - מד נכונות
+   - Final URL: https://rgb-app.vercel.app/
+
+✅ Testing complete! Check the test-screenshots folder for all captured images.
+
+📋 SUMMARY OF FINDINGS:
+   ✓ Homepage loads correctly with RGB logo and 3 profile cards
+   ✓ Profile card click navigation works
+   ✓ Onboarding guide appears and can be clicked through (15+ steps)
+   ✓ Help button (?) is visible
+   ✓ פנוי/עסוק toggle is present
+   ⚠ Sliders found: 0
+   ✓ Activity items found: 2
+   ⚠ Guide overlay persists after onboarding completion, blocking some interactions
+   ⚠ Firebase connection indicator not clearly visible in automated test
+
+📊 Waiting 5 seconds before closing browser...

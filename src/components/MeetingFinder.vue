@@ -4,7 +4,7 @@
       <span class="icon">🔍</span>
       חלונות מפגש
     </h2>
-    <p class="section-hint">זמנים שבהם לפחות שניים זמינים, ממוינים לפי סיכוי</p>
+    <p class="section-hint">מתי לפחות שניים פנויים — ממוין לפי סיכוי</p>
 
     <!-- Week Nav (synced with calendar) -->
     <div class="week-nav">
@@ -28,8 +28,9 @@
         :key="`${slot.dateKey}-${slot.hour}`"
         class="slot-card"
         :class="{
-          gold: slot.available === 3,
-          silver: slot.available === 2
+          gold: slot.available === 3 && slot.logisticsOk,
+          silver: slot.available === 2 && slot.logisticsOk,
+          'logistics-blocked': slot.available >= 2 && !slot.logisticsOk
         }"
       >
         <div class="slot-rank">{{ i + 1 }}</div>
@@ -62,6 +63,21 @@
               class="suggested-act"
               :title="act.name"
             >{{ act.icon }}</span>
+          </div>
+          <div
+            v-if="slot.available >= 2 && !slot.logisticsOk"
+            class="slot-logistics"
+          >
+            <span class="logistics-badge">⚠️ לוגיסטיקה</span>
+            <div class="logistics-insights">
+              <div
+                v-for="(insight, idx) in slot.logisticsInsights"
+                :key="idx"
+                class="insight-line"
+              >
+                {{ insight }}
+              </div>
+            </div>
           </div>
         </div>
         <div class="slot-score">
@@ -208,6 +224,11 @@ function scoreColor(score) {
   background: rgba(255, 187, 59, 0.05);
 }
 
+.slot-card.logistics-blocked {
+  border-color: rgba(255, 187, 59, 0.25);
+  background: rgba(255, 187, 59, 0.03);
+}
+
 .slot-card:hover {
   background: rgba(255, 255, 255, 0.06);
 }
@@ -340,6 +361,33 @@ function scoreColor(score) {
   display: flex;
   gap: 0.2rem;
   margin-top: 0.15rem;
+}
+
+.slot-logistics {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 187, 59, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.logistics-badge {
+  font-size: 0.75rem;
+  color: #ffbb3b;
+  font-weight: 600;
+}
+
+.logistics-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.insight-line {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.35;
 }
 
 .suggested-act {

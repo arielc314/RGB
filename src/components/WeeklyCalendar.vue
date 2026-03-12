@@ -15,7 +15,7 @@
       <button class="week-btn" @click="store.changeWeek(1)">←</button>
     </div>
 
-    <p class="section-hint">לחצו וגררו על תאים כדי לסמן זמינות</p>
+    <p class="section-hint">לחצו וגררו לתאים</p>
 
     <!-- Calendar Grid -->
     <div class="calendar-scroll">

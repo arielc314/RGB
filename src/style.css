@@ -12,6 +12,7 @@
 
 html {
   direction: rtl;
+  touch-action: manipulation; /* מניעת זום double-tap וקיצור השהיית הטאפ במובייל */
 }
 
 body {

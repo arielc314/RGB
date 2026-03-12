@@ -10,6 +10,11 @@ import {
 
 const DATA_VERSION = 3
 
+const LOCATIONS = {
+  jerusalem_gaza: { id: 'jerusalem_gaza', name: 'ירושלים, רח׳ עזה' },
+  givat_yaarim: { id: 'givat_yaarim', name: 'גבעת יערים' }
+}
+
 const PROFILES = {
   arik: {
     id: 'arik',
@@ -19,7 +24,8 @@ const PROFILES = {
     colorMid: 'rgba(255, 59, 59, 0.4)',
     glow: '0 0 30px rgba(255, 59, 59, 0.3)',
     letter: 'R',
-    emoji: '🔴'
+    emoji: '🔴',
+    homeLocation: 'jerusalem_gaza'
   },
   dor: {
     id: 'dor',
@@ -29,7 +35,8 @@ const PROFILES = {
     colorMid: 'rgba(59, 255, 111, 0.4)',
     glow: '0 0 30px rgba(59, 255, 111, 0.3)',
     letter: 'G',
-    emoji: '🟢'
+    emoji: '🟢',
+    homeLocation: 'givat_yaarim'
   },
   otsar: {
     id: 'otsar',
@@ -39,7 +46,8 @@ const PROFILES = {
     colorMid: 'rgba(59, 139, 255, 0.4)',
     glow: '0 0 30px rgba(59, 139, 255, 0.3)',
     letter: 'B',
-    emoji: '🔵'
+    emoji: '🔵',
+    homeLocation: 'givat_yaarim'
   }
 }
 
@@ -422,11 +430,96 @@ export const useAppStore = defineStore('app', () => {
     _save()
   }
 
+  // ── Logistics (default: everyone at home) ──
+  const LOGISTICS_THRESHOLD = 30
+  const canTravel = (id, dateKey, hour) => {
+    const m = getEffectiveMeters(id, dateKey, hour)
+    const mobilityOk = m.mobility !== null && m.mobility >= LOGISTICS_THRESHOLD
+    const fuelOk = m.fuel !== null && m.fuel >= LOGISTICS_THRESHOLD
+    return mobilityOk && fuelOk
+  }
+  const canHost = (id, dateKey, hour) => {
+    const m = getEffectiveMeters(id, dateKey, hour)
+    return m.hosting !== null && m.hosting >= LOGISTICS_THRESHOLD
+  }
+  const getLocationAt = (id, dateKey, hour) => {
+    const loc = profileData.value[id].locationOverride?.[dateKey]?.[hour]
+    return loc || PROFILES[id]?.homeLocation || 'givat_yaarim'
+  }
+
+  function getLogisticsForSlot(dateKey, hour, availableIds) {
+    if (availableIds.length < 2) return { ok: false, reason: 'פחות משניים זמינים', insights: [], suggestions: [] }
+
+    const byLoc = {}
+    availableIds.forEach(id => {
+      const loc = getLocationAt(id, dateKey, hour)
+      if (!byLoc[loc]) byLoc[loc] = []
+      byLoc[loc].push(id)
+    })
+
+    const locs = Object.keys(byLoc)
+    const allSamePlace = locs.length === 1
+    if (allSamePlace) {
+      return { ok: true, reason: 'כולם באותו מקום', insights: [], suggestions: [] }
+    }
+
+    // Need travel + host match
+    const canTravelIds = availableIds.filter(id => canTravel(id, dateKey, hour))
+    const canHostIds = availableIds.filter(id => canHost(id, dateKey, hour))
+
+    if (canTravelIds.length === 0 && !allSamePlace) {
+      const insights = [
+        'כולם בבית ונצרכים לנסוע — אף אחד לא יכול לנסוע (נכונות לנסיעה + דלק)',
+        'חסר רק שמישהו יחליט שהוא יכול להוציא רכב'
+      ]
+      const suggestions = []
+      availableIds.forEach(id => {
+        const m = getEffectiveMeters(id, dateKey, hour)
+        const name = PROFILES[id]?.name
+        if (m.fuel === null || m.fuel < LOGISTICS_THRESHOLD) {
+          suggestions.push({ who: name, action: 'תתדלק', result: 'אולי תוכל לגרום למפגש אפשרי' })
+        }
+        if (m.mobility === null || m.mobility < LOGISTICS_THRESHOLD) {
+          suggestions.push({ who: name, action: 'עדכן נכונות לנסוע', result: 'אולי תוכל לגרום למפגש אפשרי' })
+        }
+      })
+      return { ok: false, reason: 'אין אף אחד שיכול לנסוע', insights, suggestions }
+    }
+
+    if (canHostIds.length === 0 && !allSamePlace) {
+      const insights = [
+        'כולם בבית ונצרך מישהו לארח — אף אחד לא יכול לארח',
+        'חסר רק שמישהו שיסכים לארח'
+      ]
+      const suggestions = availableIds.map(id => ({
+        who: PROFILES[id]?.name,
+        action: 'עדכן נכונות לארח',
+        result: 'יכול לגרום למפגש אפשרי'
+      }))
+      return { ok: false, reason: 'אין אף אחד שיכול לארח', insights, suggestions }
+    }
+
+    return { ok: true, reason: 'יש התאמה נסיעה–אירוח', insights: [], suggestions: [] }
+  }
+
+  function getLogisticsInsights(dateKey, hour, availableIds, logistics) {
+    if (logistics.ok) return []
+    const lines = [...logistics.insights]
+    logistics.suggestions.forEach(s => {
+      lines.push(`${s.who}, אם ${s.action} — ${s.result}`)
+    })
+    if (lines.length === 0 && !logistics.ok) {
+      lines.push('חסר רק שמישהו יחליט שהוא יכול להוציא רכב או לארח')
+    }
+    return lines
+  }
+
   // ── Meeting logic ──
 
   function getOverlapScore(dateKey, hour) {
     let available = 0
     let totalReadiness = 0
+    const availableIds = []
     const ids = Object.keys(PROFILES)
 
     ids.forEach(id => {
@@ -435,6 +528,7 @@ export const useAppStore = defineStore('app', () => {
       if (!isHourAvailable(id, dateKey, hour)) return
 
       available++
+      availableIds.push(id)
       const meters = getEffectiveMeters(id, dateKey, hour)
 
       let score = 50
@@ -444,10 +538,25 @@ export const useAppStore = defineStore('app', () => {
       totalReadiness += score
     })
 
-    if (available === 0) return { available, score: 0, label: 'אין זמינות' }
-    if (available === 1) return { available, score: totalReadiness / available * 0.3, label: 'אחד זמין' }
-    if (available === 2) return { available, score: totalReadiness / available * 0.7, label: 'שניים זמינים' }
-    return { available, score: totalReadiness / available, label: 'כולם זמינים!' }
+    let baseLabel = 'אין זמינות'
+    let baseScore = 0
+    if (available >= 1) baseLabel = available === 1 ? 'אחד זמין' : (available === 2 ? 'שניים זמינים' : 'כולם זמינים!')
+    if (available >= 1) baseScore = totalReadiness / available * (available === 1 ? 0.3 : available === 2 ? 0.7 : 1)
+
+    const logistics = getLogisticsForSlot(dateKey, hour, availableIds)
+    const insights = getLogisticsInsights(dateKey, hour, availableIds, logistics)
+    const logisticsPenalty = logistics.ok ? 1 : 0.25
+    const score = baseScore * logisticsPenalty
+
+    return {
+      available,
+      score,
+      label: baseLabel,
+      logisticsOk: logistics.ok,
+      logisticsReason: logistics.reason,
+      logisticsInsights: insights,
+      availableIds
+    }
   }
 
   function getSlotSuggestedActivities(dateKey, hour) {
@@ -511,6 +620,7 @@ export const useAppStore = defineStore('app', () => {
 
   return {
     PROFILES,
+    LOCATIONS,
     DAYS,
     HOURS,
     METERS,

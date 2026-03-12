@@ -1,6 +1,6 @@
 <template>
   <div class="status-panel">
-    <!-- Busy Toggle -->
+    <!-- Busy Toggle - Primary Action -->
     <button
       class="busy-toggle"
       :class="{ active: store.currentData.busy }"
@@ -13,13 +13,20 @@
       </span>
     </button>
 
-    <h2 class="section-title">
-      <span class="icon">📊</span>
-      המדדים שלי
-    </h2>
-    <p class="section-hint">לא חובה למלא הכל — מה שרלוונטי</p>
-
-    <div class="meters-grid">
+    <!-- Collapsible: Meters -->
+    <div class="collapsible-section">
+      <button class="section-toggle" @click="showMeters = !showMeters">
+        <span class="section-title">
+          <span class="icon">📊</span>
+          המדדים שלי
+          <span v-if="metersCount > 0" class="section-badge">{{ metersCount }}</span>
+        </span>
+        <span class="toggle-arrow">{{ showMeters ? '▲' : '▼' }}</span>
+      </button>
+      <Transition name="expand">
+        <div v-show="showMeters" class="section-body">
+          <p class="section-hint">לא חובה למלא הכל — מה שרלוונטי</p>
+          <div class="meters-grid">
       <div
         v-for="meter in store.METERS"
         :key="meter.id"
@@ -73,56 +80,75 @@
           </div>
         </div>
       </div>
+          </div>
+        </div>
+      </Transition>
     </div>
 
-    <!-- Activities Section -->
-    <h2 class="section-title" style="margin-top: 0.5rem;">
-      <span class="icon">🎮</span>
-      חשק לפעילויות
-    </h2>
-    <p class="section-hint">לחצו כדי לעדכן — לחיצה נוספת משנה רמה</p>
-
-    <div class="activities-category">
-      <h3 class="category-label">🕹️ משחקים</h3>
-      <div class="activities-grid">
-        <button
-          v-for="act in gameActivities"
-          :key="act.id"
-          class="activity-card"
-          :class="getActivityClass(act.id)"
-          @click="store.cycleActivity(act.id)"
-          @contextmenu.prevent="store.clearActivity(act.id)"
-        >
-          <span class="act-icon">{{ act.icon }}</span>
-          <span class="act-name">{{ act.name }}</span>
-          <span class="act-level">{{ getActivityEmoji(act.id) }}</span>
-        </button>
-      </div>
+    <!-- Collapsible: Activities -->
+    <div class="collapsible-section">
+      <button class="section-toggle" @click="showActivities = !showActivities">
+        <span class="section-title">
+          <span class="icon">🎮</span>
+          חשק לפעילויות
+          <span v-if="activitiesCount > 0" class="section-badge">{{ activitiesCount }}</span>
+        </span>
+        <span class="toggle-arrow">{{ showActivities ? '▲' : '▼' }}</span>
+      </button>
+      <Transition name="expand">
+        <div v-show="showActivities" class="section-body">
+          <p class="section-hint">לחצו כדי לעדכן — לחיצה נוספת משנה רמה</p>
+          <div class="activities-category">
+            <h3 class="category-label">🕹️ משחקים</h3>
+            <div class="activities-grid">
+              <button
+                v-for="act in gameActivities"
+                :key="act.id"
+                class="activity-card"
+                :class="getActivityClass(act.id)"
+                @click="store.cycleActivity(act.id)"
+                @contextmenu.prevent="store.clearActivity(act.id)"
+              >
+                <span class="act-icon">{{ act.icon }}</span>
+                <span class="act-name">{{ act.name }}</span>
+                <span class="act-level">{{ getActivityEmoji(act.id) }}</span>
+              </button>
+            </div>
+          </div>
+          <div class="activities-category">
+            <h3 class="category-label">🌟 פעילויות</h3>
+            <div class="activities-grid">
+              <button
+                v-for="act in hangoutActivities"
+                :key="act.id"
+                class="activity-card"
+                :class="getActivityClass(act.id)"
+                @click="store.cycleActivity(act.id)"
+                @contextmenu.prevent="store.clearActivity(act.id)"
+              >
+                <span class="act-icon">{{ act.icon }}</span>
+                <span class="act-name">{{ act.name }}</span>
+                <span class="act-level">{{ getActivityEmoji(act.id) }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </div>
 
-    <div class="activities-category">
-      <h3 class="category-label">🌟 פעילויות</h3>
-      <div class="activities-grid">
-        <button
-          v-for="act in hangoutActivities"
-          :key="act.id"
-          class="activity-card"
-          :class="getActivityClass(act.id)"
-          @click="store.cycleActivity(act.id)"
-          @contextmenu.prevent="store.clearActivity(act.id)"
-        >
-          <span class="act-icon">{{ act.icon }}</span>
-          <span class="act-name">{{ act.name }}</span>
-          <span class="act-level">{{ getActivityEmoji(act.id) }}</span>
-        </button>
-      </div>
-    </div>
-
+    <!-- Collapsible: Note -->
+    <div class="collapsible-section">
+      <button class="section-toggle" @click="showNote = !showNote">
+        <span class="section-title">
+          <span class="icon">💬</span>
+          הערה חופשית
+          <span v-if="store.currentData.note" class="section-dot"></span>
+        </span>
+        <span class="toggle-arrow">{{ showNote ? '▲' : '▼' }}</span>
+      </button>
+      <Transition name="expand">
+        <div v-show="showNote" class="section-body">
     <div class="note-section">
-      <label class="note-label">
-        <span class="icon">💬</span>
-        הערה חופשית
-      </label>
       <textarea
         class="note-input"
         :value="store.currentData.note"
@@ -131,15 +157,32 @@
         rows="2"
       ></textarea>
     </div>
+        </div>
+      </Transition>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed, reactive } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { useAppStore } from '../stores/appStore'
 
 const store = useAppStore()
 const sliderRefs = reactive({})
+
+const showMeters = ref(true)
+const showActivities = ref(false)
+const showNote = ref(false)
+
+const metersCount = computed(() => {
+  const m = store.currentData.meters
+  return Object.values(m || {}).filter(v => v !== null).length
+})
+
+const activitiesCount = computed(() => {
+  const a = store.currentData.activities
+  return Object.values(a || {}).filter(v => v !== null && v >= 1).length
+})
 
 const currentMeters = computed(() => store.currentData.meters)
 const profileColor = computed(() => store.currentProfile?.color || '#fff')
@@ -268,14 +311,82 @@ function getLabel(value, inverted) {
   background: #ff3b3b;
 }
 
+/* Collapsible sections */
+.collapsible-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.section-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.section-toggle:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
 .section-title {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0.5rem 0 0 0;
+  margin: 0;
+}
+
+.section-badge {
+  font-size: 0.7rem;
+  background: v-bind('profileColor + "55"');
+  color: v-bind('profileColor');
+  padding: 0.15rem 0.45rem;
+  border-radius: 1rem;
+  font-weight: 700;
+}
+
+.section-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: v-bind('profileColor');
+}
+
+.toggle-arrow {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.section-body {
+  padding: 0 1rem 1rem;
+}
+
+.section-body .section-hint {
+  margin-bottom: 0.75rem;
+}
+
+.expand-enter-active, .expand-leave-active {
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+.expand-enter-from, .expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.expand-enter-to, .expand-leave-from {
+  max-height: 800px;
 }
 
 .section-hint {
@@ -415,17 +526,7 @@ function getLabel(value, inverted) {
 }
 
 .note-section {
-  margin-top: 0.5rem;
-}
-
-.note-label {
-  font-size: 1rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: 0;
 }
 
 .note-input {

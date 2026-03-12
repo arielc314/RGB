@@ -74,9 +74,14 @@
       </div>
     </div>
 
-    <!-- Activity Overlap -->
-    <div class="activity-overlap-section" v-if="activityOverlap.length > 0">
-      <h3 class="sub-title">🎮 חשק משותף לפעילויות</h3>
+    <!-- Activity Overlap (collapsible) -->
+    <div class="collapsible-section" v-if="activityOverlap.length > 0">
+      <button class="section-toggle" @click="showOverlap = !showOverlap">
+        <h3 class="sub-title">🎮 חשק משותף לפעילויות</h3>
+        <span class="toggle-arrow">{{ showOverlap ? '▲' : '▼' }}</span>
+      </button>
+      <Transition name="expand">
+        <div v-show="showOverlap" class="section-body">
       <div class="overlap-list">
         <div
           v-for="item in activityOverlap"
@@ -102,10 +107,17 @@
           </span>
         </div>
       </div>
+        </div>
+      </Transition>
     </div>
 
-    <div class="composite-section">
-      <h3 class="sub-title">🎯 מד נכונות משולב</h3>
+    <div class="composite-section collapsible-section">
+      <button class="section-toggle" @click="showComposite = !showComposite">
+        <h3 class="sub-title">🎯 מד נכונות משולב</h3>
+        <span class="toggle-arrow">{{ showComposite ? '▲' : '▼' }}</span>
+      </button>
+      <Transition name="expand">
+        <div v-show="showComposite" class="section-body">
       <div class="composite-meter">
         <div class="composite-track">
           <div
@@ -137,15 +149,20 @@
         </div>
         <div class="group-score-label">סיכוי למפגש</div>
       </div>
+        </div>
+      </Transition>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useAppStore } from '../stores/appStore'
 
 const store = useAppStore()
+
+const showOverlap = ref(false)
+const showComposite = ref(false)
 
 function pdata(id) {
   return store.profileData[id]
@@ -398,7 +415,53 @@ function formatTime(iso) {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 1rem;
-  padding: 1.25rem;
+}
+
+.toggle-arrow {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.expand-enter-active, .expand-leave-active {
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+.expand-enter-from, .expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.expand-enter-to, .expand-leave-from {
+  max-height: 500px;
+}
+
+.collapsible-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.collapsible-section .section-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.collapsible-section .section-toggle:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.collapsible-section .section-body {
+  padding: 0 1.25rem 1.25rem;
 }
 
 .sub-title {
