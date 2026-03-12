@@ -333,7 +333,7 @@ function getMeterInfo(meterId) {
   gap: 1px;
   background: rgba(255, 255, 255, 0.04);
   min-width: 500px;
-  touch-action: none;
+  touch-action: pan-y; /* מאפשר גלילה אנכית של הדף במובייל; גרירה אופקית בתאים ממשיכה לעבוד */
   user-select: none;
   -webkit-user-select: none;
 }
